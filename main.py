@@ -1,5 +1,5 @@
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMessageBox, QFileDialog
 
 
 class MainWindow(QMainWindow):
@@ -24,12 +24,19 @@ class MainWindow(QMainWindow):
         menu_about = self.menuBar.addMenu("О программе")
         menu_about.addAction("Информация", self.about, shortcut='F1')
 
+        menu_about.addAction("Выбрать файл", self.open_file_dialog, shortcut='F2')
+
     def about(self):
         text = "    Авторы: Мусина С.А., Миянов М.Р.\n" \
                "    Программа создана в рамках работы по созданию алгоритмов" \
                " по интеллектуальной поддержке принятия решений при управлении" \
                " процессом флокуляционной очистки сточных вод"
         QMessageBox.about(self, "Информация", text)
+
+    def open_file_dialog(self):
+        import os
+        fname, _ = QFileDialog.getOpenFileName(self, "Выберите файл", '.', "Файлы Exсel (*.xlsx *.xls)")
+        print(f"name = {os.path.basename(fname).split('/')[-1]}")
 
 
 if __name__ == "__main__":
