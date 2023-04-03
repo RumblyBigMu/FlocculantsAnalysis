@@ -5,35 +5,39 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import RegularPolygon, Ellipse
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.patches import RegularPolygon
 from matplotlib import cm, colorbar
 from matplotlib.lines import Line2D
 
 
 class SOM():
     def __init__(self, fname="FlocculantsData.xlsx", epochs=1000, learning_rate=0.5):
+        """
+        Конструктор класса SOM
+        :param fname: имя файла
+        :type fname: str
+        :param epochs: количество эпох обучения
+        :type epochs: int
+        :param learning_rate: коэффициент обучения
+        :type learning_rate: float
+        """
         self.fname = fname
-        self.som = None
         # Гиперпараметры сети
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.sigma = 1.5
-        self.grid_rows = None
-        self.grid_columns = None
+        self.grid_rows = 10
+        self.grid_columns = 10
         # Датасет
         self.target = None
         self.label_names = None
-        self.data = self.data_preprocessing()
-        # Обучение
-        self.learning()
+        self.data = None
 
     def learning(self):
         """
         Функция обучения сети
-
-        :return: обученная сеть
         """
+        self.data = self.data_preprocessing()
         self.som = MiniSom(self.grid_rows, self.grid_columns, self.data.shape[1],
                            sigma=self.sigma,
                            learning_rate=self.learning_rate,
@@ -45,9 +49,6 @@ class SOM():
     def data_preprocessing(self):
         """
         Функция, выполняющая чтение и обработку датесета
-
-        :param fname: имя файла
-        :type fname: str
 
         :rtype: numpy.ndarray
         :return: массив данных
@@ -64,7 +65,7 @@ class SOM():
         # Нормализация данных
         data = self.__normalization__(data)
 
-        # Задание сетки оптимального размера
+        # Задание карты оптимального размера
         size = np.math.ceil(np.sqrt(5 * np.sqrt(len(data))))
         self.grid_rows = size
         self.grid_columns = size
@@ -85,6 +86,9 @@ class SOM():
         return data
 
     def plot_som(self):
+        """
+        Функция отрисовки карты
+        """
         xx, yy = self.som.get_euclidean_coordinates()
         umatrix = self.som.distance_map()
         weights = self.som.get_weights()
@@ -164,4 +168,5 @@ class SOM():
 
 if __name__ == "__main__":
     som = SOM()
+    som.learning()
     som.plot_som()
