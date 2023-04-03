@@ -105,6 +105,7 @@ class SOM():
 
         # Создание фигуры
         fig = plt.figure(figsize=(16, 8))
+        fig.suptitle("Самоорганизующаяся карта Кохонена", fontsize=20)
 
         # Самоорганизующаяся карта Кохонена
         ax1 = fig.add_subplot(121)

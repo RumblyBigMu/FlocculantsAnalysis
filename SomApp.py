@@ -3,7 +3,7 @@ import SOM
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QSpinBox, \
-    QGridLayout, QMenuBar, QMessageBox, QLabel, QDoubleSpinBox, QFileDialog
+    QGridLayout, QMenuBar, QMessageBox, QLabel, QDoubleSpinBox, QFileDialog, QCheckBox
 
 
 class MainWindow(QMainWindow):
@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle("Анализ флокулянтов")
-        self.setMinimumSize(500, 500)
+        self.setMinimumSize(500, 300)
         self.resize(650, 650)
         self.setMaximumSize(800, 800)
         # Генерация меню
@@ -51,8 +51,8 @@ class CentralWidget(QWidget):
         # Настройка виджета
 
         #   Лэйбл: параметры сети
-        self.settings_label = QLabel(self)
-        self.settings_label.setText("Параметры сети")
+        # self.settings_label = QLabel(self)
+        # self.settings_label.setText("Параметры сети")
 
         #   Создание спин-боксов
         self.__configureSpins__()
@@ -61,6 +61,9 @@ class CentralWidget(QWidget):
         self.lr_label = QLabel(self)
         self.lr_label.setText("Выберите коэффициент обучения: ")
 
+        #   Лэйбл: выбор файла
+        self.file_label = QLabel(self)
+        self.file_label.setText("Выберите файла с данными: ")
         #   Кнопка выбора файла с данными
         self.browse_file = QPushButton("Выбрать файл", self)
         self.browse_file.clicked.connect(self.open_file_dialog)
@@ -69,9 +72,10 @@ class CentralWidget(QWidget):
         self.start_training = QPushButton("Начать обучение", self)
         self.start_training.clicked.connect(self.startTraining)
 
-        #   Информативный лэйбл
-        self.info_label = QLabel()
-        self.info_label.setAlignment(Qt.AlignCenter)
+        self.check_plot = QCheckBox("Нарисовать карту", self)
+
+        #   Лэйбл: статус обучения
+        self.status_label = QLabel(self)
 
         #   Кнопка сброса интерфейса
         self.reset_button = QPushButton("Сбросить", self)
@@ -83,7 +87,10 @@ class CentralWidget(QWidget):
         self.grid.setContentsMargins(20, 20, 20, 20)
         self.grid.setSpacing(15)
 
-        self.grid.addWidget(self.settings_label, 0, 0, 1, 3, alignment=Qt.AlignCenter)
+        # self.grid.addWidget(self.settings_label, 2, 0, 1, 3, alignment=Qt.AlignCenter)
+
+        self.grid.addWidget(self.file_label, 0, 0, 1, 2, alignment=Qt.AlignLeft)
+        self.grid.addWidget(self.browse_file, 0, 2)
 
         self.grid.addWidget(self.epochs_label, 1, 0, 1, 2, alignment=Qt.AlignLeft)
         self.grid.addWidget(self.epochs_spin, 1, 2)
@@ -91,13 +98,12 @@ class CentralWidget(QWidget):
         self.grid.addWidget(self.lr_label, 2, 0, 1, 2, alignment=Qt.AlignLeft)
         self.grid.addWidget(self.lr_spin, 2, 2)
 
-        self.grid.addWidget(self.browse_file, 3, 1)
+        self.grid.addWidget(self.start_training, 3, 2)
+        self.grid.addWidget(self.check_plot, 3, 0, 1, 2)
 
-        self.grid.addWidget(self.start_training, 4, 1)
+        self.grid.addWidget(self.status_label, 4, 1, alignment=Qt.AlignCenter)
 
-        self.grid.addWidget(self.info_label, 5, 1, alignment=Qt.AlignCenter)
-
-        self.grid.addWidget(self.reset_button, 6, 1)
+        self.grid.addWidget(self.reset_button, 5, 1)
 
         self.setLayout(self.grid)
 
@@ -125,16 +131,23 @@ class CentralWidget(QWidget):
         self.reset_button.setEnabled(True)
 
         if self.fname == None or self.fname == "":
-            self.info_label.setText("Сначала выберите файл!")
-            self.info_label.setStyleSheet("color: red")
+            self.status_label.setText("Сначала выберите файл!")
+            self.status_label.setStyleSheet("color: red")
+            self.browse_file.setDisabled(True)
+            self.epochs_spin.setDisabled(True)
+            self.lr_spin.setDisabled(True)
+            self.reset_button.setEnabled(True)
         else:
             self.som = SOM.SOM(self.fname, self.epochs_spin.value(), self.lr_spin.value())
             self.som.learning()
-            self.info_label.setText("Обучение завершено!")
-            self.info_label.setStyleSheet("color: green")
+            if self.check_plot.isChecked():
+                self.som.plot_som()
+            self.status_label.setText("Обучение завершено!")
+            self.status_label.setStyleSheet("color: green")
 
     def reset(self):
         self.fname = None
+        self.browse_file.setEnabled(True)
 
         self.epochs_spin.setEnabled(True)
         self.epochs_spin.setValue(1000)
@@ -142,10 +155,13 @@ class CentralWidget(QWidget):
         self.lr_spin.setEnabled(True)
         self.lr_spin.setValue(0.5)
 
-        self.info_label.clear()
-        self.info_label.setStyleSheet("color: black")
+        self.status_label.clear()
+        self.status_label.setStyleSheet("color: black")
 
         self.reset_button.setDisabled(True)
+
+    def plot(self):
+        self.som.plot_som()
 
 
 if __name__ == "__main__":
