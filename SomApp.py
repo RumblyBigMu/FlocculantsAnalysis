@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle("Анализ флокулянтов")
-        self.setMinimumSize(500, 300)
+        self.setMinimumSize(500, 500)
         self.resize(650, 500)
         self.setMaximumSize(800, 800)
         # Генерация меню
@@ -90,7 +90,7 @@ class CentralWidget(QWidget):
         settings_grid.addWidget(self.check_plot, 3, 0, 1, 2)
         settings_grid.addWidget(self.status_label, 4, 1, alignment=Qt.AlignCenter)
         settings_grid.addWidget(self.plot_button, 5, 1)
-        settings_grid.addWidget(self.reset_button, 6, 1)
+        # settings_grid.addWidget(self.reset_button, 6, 1)
 
         self.settings_groupbox.setLayout(settings_grid)
 
@@ -99,30 +99,36 @@ class CentralWidget(QWidget):
         self.__configureSampleLabels__()
         #   Кнопка прогноза
         self.predict_button = QPushButton("Получить скорость осаждения", self)
+        self.predict_button.clicked.connect(self.predict)
         #   Лэйбл: прогноз
         self.predict_label = QLabel(self)
+        #   Кнопка отрисовки карты эксперимента
+        self.plot_sample_button = QPushButton("Отрисовать эксперимент на карте", self)
+        self.plot_sample_button.clicked.connect(self.plot_prediction)
 
         labels = [self.dose_spin_label, self.mass_spin_label, self.l_expenses_label, self.m_expenses_label,
                   self.v_mixing_label, self.t_mixing_label, self.h_layer_label, self.t_layer_label]
-        spins = [self.dose_spin, self.mass_spin, self.l_expenses_spin, self.m_expenses_spin, self.v_mixing_spin,
-                 self.t_mixing_spin, self.h_layer_spin, self.t_layer_spin]
+        self.spins = [self.dose_spin, self.mass_spin, self.l_expenses_spin, self.m_expenses_spin, self.v_mixing_spin,
+                      self.t_mixing_spin, self.h_layer_spin, self.t_layer_spin]
         #  Группировка элементов окна, отвечающих за результаты отдельного эксперимента
         self.sample_groupbox = QGroupBox("Информация об эксперименте", self)
         self.sample_groupbox.setDisabled(True)
         sample_grid = QGridLayout(self)
-        grid_cols = len(labels)
+        self.grid_cols = len(labels)
 
-        for i in range(grid_cols):
+        for i in range(self.grid_cols):
             sample_grid.addWidget(labels[i], 0, i, 1, 1, alignment=Qt.AlignCenter)
-            sample_grid.addWidget(spins[i], 1, i, 1, 1)
-        sample_grid.addWidget(self.predict_label, 2, 0, 1, grid_cols, alignment=Qt.AlignCenter)
-        sample_grid.addWidget(self.predict_button, 3, 0, 1, grid_cols, alignment=Qt.AlignCenter)
+            sample_grid.addWidget(self.spins[i], 1, i, 1, 1)
+        sample_grid.addWidget(self.predict_label, 2, 0, 1, self.grid_cols, alignment=Qt.AlignCenter)
+        sample_grid.addWidget(self.predict_button, 3, 0, 1, self.grid_cols, alignment=Qt.AlignCenter)
+        sample_grid.addWidget(self.plot_sample_button, 4, 0, 1, self.grid_cols, alignment=Qt.AlignCenter)
         self.sample_groupbox.setLayout(sample_grid)
 
         #  Расположение элементов в сетке
         self.vbox = QVBoxLayout()
         self.vbox.addWidget(self.settings_groupbox)
         self.vbox.addWidget(self.sample_groupbox)
+        self.vbox.addWidget(self.reset_button)
         self.setLayout(self.vbox)
 
         #  Расположение элементов в сетке
@@ -192,7 +198,7 @@ class CentralWidget(QWidget):
         self.h_layer_spin.setSingleStep(1)
         # Выбор времени осветления слоя
         self.t_layer_spin = QSpinBox(self)
-        self.t_layer_spin.setRange(50, 150)
+        self.t_layer_spin.setRange(50, 200)
         self.t_layer_spin.setValue(50)
         self.t_layer_spin.setSingleStep(1)
 
@@ -246,8 +252,10 @@ class CentralWidget(QWidget):
 
         self.status_label.clear()
         self.status_label.setStyleSheet("color: black")
+        self.predict_label.clear()
 
         self.plot_button.setDisabled(True)
+        self.reset_button.setDisabled(True)
         self.reset_button.setDisabled(True)
 
         self.sample_groupbox.setDisabled(True)
@@ -255,6 +263,24 @@ class CentralWidget(QWidget):
     def plot_map(self):
         if not self.som == None:
             self.som.plot_som()
+
+    def __generateSample__(self):
+        sample = []
+        for spin in self.spins:
+            sample.append(spin.value())
+        return sample
+
+    def predict(self):
+        sample = self.__generateSample__()
+        if not self.som == None:
+            self.som.regression(sample)
+            self.predict_label.setText(f"Ожидаемая скорость осаждения: {round(float(self.som.y_pred), 2)} мм/с")
+
+    def plot_prediction(self):
+        sample = self.__generateSample__()
+        if not self.som == None:
+            self.som.regression(sample)
+            self.som.plot_sample()
 
 
 if __name__ == "__main__":
