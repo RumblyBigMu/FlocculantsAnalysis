@@ -59,7 +59,8 @@ class SOM():
 
         # Извлечение меток данных
         self.target = data['Type'].values
-        self.label_names = {1: 'Type 1', 2: 'Type 2', 3: 'Type 3'}
+        self.label_names = {'неудовл': 'Неудовлетворительно', 'удовл': 'Удовлетворительно', 'хор': 'Хорошо',
+                            'отл': 'Отлично'}
         data = data[data.columns[:-1]]
 
         # Нормализация данных
@@ -98,8 +99,8 @@ class SOM():
         w_y = np.array(w_y)
 
         # Маркеры данных
-        markers = ['p', 'X', '*']  # Форма меток
-        colors = ['brown', 'darkgreen', 'navy']  # Цвета меток
+        markers = {'неудовл': 'p', 'удовл': 'X', 'хор': 'D', 'отл': 'H'}  # Форма меток
+        colors = {'неудовл': 'darkgreen', 'удовл': 'olive', 'хор': 'yellowgreen', 'отл': 'lightgreen'}  # Цвета меток
         map_style = cm.Wistia  # Цветовая карта
         alpha = 1  # Прозрачность
 
@@ -128,9 +129,9 @@ class SOM():
             wx, wy = self.som.convert_map_to_euclidean(w)
             wy = wy * np.sqrt(3) / 2
             ax1.plot(wx, wy,
-                     markers[self.target[cnt] - 1],
-                     markerfacecolor=colors[self.target[cnt] - 1],
-                     markeredgecolor=colors[self.target[cnt] - 1],
+                     markers[self.target[cnt]],
+                     markerfacecolor=colors[self.target[cnt]],
+                     markeredgecolor=colors[self.target[cnt]],
                      markersize=12,
                      markeredgewidth=2)
         # Настройка делений осей
@@ -140,26 +141,25 @@ class SOM():
         ax1.set_yticks(yrange * np.sqrt(3) / 2, yrange)
         # Настройка легенды
         legend_elements = []
-        for i in range(len(np.unique(self.target))):
-            legend_elements.append(Line2D([0], [0], marker=markers[i], color=colors[i], label=self.label_names[i + 1],
-                                          markerfacecolor=colors[i], markersize=14, linestyle='None',
+        target_names = ['неудовл', 'удовл', 'хор', 'отл']
+        for i in target_names:
+            legend_elements.append(Line2D([0], [0], marker=markers[i], color=colors[i], label=self.label_names[i],
+                                          markerfacecolor=colors[i], markersize=5, linestyle='None',
                                           markeredgewidth=2))
-        ax1.legend(handles=legend_elements, bbox_to_anchor=(0, 1.08), loc='upper left',
-                   borderaxespad=0, ncol=3, fontsize=12)
+        ax1.legend(handles=legend_elements, loc='upper left', ncol=1, fontsize=8)
 
         # Отрисовка датасета на карте
         ax2 = fig.add_subplot(122)
         ax2.set_aspect('equal')
         plt.pcolor(self.som.distance_map().T, cmap=map_style, alpha=alpha)
         # Распределение данных по карте
-        for c in np.unique(self.target):
+        for c in target_names:
             idx_target = self.target == c
             ax2.scatter(w_x[idx_target] + .5 + (np.random.rand(np.sum(idx_target)) - .5) * .8,
                         w_y[idx_target] + .5 + (np.random.rand(np.sum(idx_target)) - .5) * .8,
-                        s=40, c=colors[c - 1], label=self.label_names[c])
+                        s=40, c=colors[c], label=self.label_names[c])
         # Настройка легенды
-        ax2.legend(bbox_to_anchor=(0, 1.08), loc='upper left',
-                   borderaxespad=0, ncol=3, fontsize=12)
+        ax2.legend(loc='upper left', ncol=1, fontsize=8)
 
         # Отрисовка цветовой шкалы
         plt.colorbar()
