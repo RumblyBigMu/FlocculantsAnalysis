@@ -90,7 +90,6 @@ class CentralWidget(QWidget):
         settings_grid.addWidget(self.check_plot, 3, 0, 1, 2)
         settings_grid.addWidget(self.status_label, 4, 1, alignment=Qt.AlignCenter)
         settings_grid.addWidget(self.plot_button, 5, 1)
-        # settings_grid.addWidget(self.reset_button, 6, 1)
 
         self.settings_groupbox.setLayout(settings_grid)
 
@@ -110,6 +109,7 @@ class CentralWidget(QWidget):
                   self.v_mixing_label, self.t_mixing_label, self.h_layer_label, self.t_layer_label]
         self.spins = [self.dose_spin, self.mass_spin, self.l_expenses_spin, self.m_expenses_spin, self.v_mixing_spin,
                       self.t_mixing_spin, self.h_layer_spin, self.t_layer_spin]
+
         #  Группировка элементов окна, отвечающих за результаты отдельного эксперимента
         self.sample_groupbox = QGroupBox("Информация об эксперименте", self)
         self.sample_groupbox.setDisabled(True)
@@ -154,20 +154,20 @@ class CentralWidget(QWidget):
         self.l_expenses_label = QLabel("c, г/л", self)
         self.m_expenses_label = QLabel("c, г/м^3", self)
         self.v_mixing_label = QLabel("n, об/мин", self)
-        self.t_mixing_label = QLabel("t, с", self)
+        self.t_mixing_label = QLabel("t_пер, с", self)
         self.h_layer_label = QLabel("h, мм", self)
         self.t_layer_label = QLabel("t, с", self)
 
     def __configureSampleSpins__(self):
         # Выбор дозы раствора
         self.dose_spin = QDoubleSpinBox(self)
-        self.dose_spin.setRange(0.5, 10)
+        self.dose_spin.setRange(0, 10)
         self.dose_spin.setValue(0.5)
         self.dose_spin.setSingleStep(0.5)
         # Выбор массы флокулянта в дозе раствора
         self.mass_spin = QDoubleSpinBox(self)
         self.mass_spin.setDecimals(5)
-        self.mass_spin.setRange(0.00005, 0.001)
+        self.mass_spin.setRange(0, 0.001)
         self.mass_spin.setValue(0.00005)
         self.mass_spin.setSingleStep(0.00005)
         # Выбор расхода флокулянта на литр
@@ -188,17 +188,17 @@ class CentralWidget(QWidget):
         self.v_mixing_spin.setSingleStep(30)
         # Выбор времени перемешивания
         self.t_mixing_spin = QSpinBox(self)
-        self.t_mixing_spin.setRange(5, 30)
+        self.t_mixing_spin.setRange(0, 200)
         self.t_mixing_spin.setValue(5)
         self.t_mixing_spin.setSingleStep(5)
         # Выбор высоты осветленного слоя
         self.h_layer_spin = QSpinBox(self)
-        self.h_layer_spin.setRange(60, 100)
+        self.h_layer_spin.setRange(0, 200)
         self.h_layer_spin.setValue(60)
         self.h_layer_spin.setSingleStep(1)
         # Выбор времени осветления слоя
         self.t_layer_spin = QSpinBox(self)
-        self.t_layer_spin.setRange(50, 200)
+        self.t_layer_spin.setRange(0, 300)
         self.t_layer_spin.setValue(50)
         self.t_layer_spin.setSingleStep(1)
 
