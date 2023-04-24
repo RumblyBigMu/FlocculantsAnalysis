@@ -217,7 +217,8 @@ class CentralWidget(QWidget):
     def open_file_dialog(self):
         import os
         fname, _ = QFileDialog.getOpenFileName(self, "Выберите файл", '.', "Файлы Exсel (*.xlsx *.xls)")
-        self.fname = os.path.basename(fname).split('/')[-1]
+        # self.fname = os.path.basename(fname).split('/')[-1]
+        self.fname = fname
         print(f"fname = {self.fname}")
 
     def startTraining(self):
