@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
     def about(self):
         text = "    Авторы: Мусина С.А., Миянов М.Р.\n" \
                "    Программа создана в рамках работы по созданию алгоритмов" \
-               " по интеллектуальной поддержке принятия решений при управлении" \
+               " интеллектуальной поддержки принятия решений при управлении" \
                " процессом флокуляционной очистки сточных вод."
         QMessageBox.about(self, "Информация", text)
 
@@ -130,23 +130,6 @@ class CentralWidget(QWidget):
         self.vbox.addWidget(self.sample_groupbox)
         self.vbox.addWidget(self.reset_button)
         self.setLayout(self.vbox)
-
-        #  Расположение элементов в сетке
-        # self.settings_grid = QGridLayout(self)
-        # self.settings_grid.setContentsMargins(20, 20, 20, 20)
-        # self.settings_grid.setSpacing(15)
-        # self.settings_grid.addWidget(self.settings_label, 2, 0, 1, 3, alignment=Qt.AlignCenter)
-        # self.settings_grid.addWidget(self.file_label, 0, 0, 1, 2, alignment=Qt.AlignLeft)
-        # self.settings_grid.addWidget(self.browse_file, 0, 2)
-        # self.settings_grid.addWidget(self.epochs_label, 1, 0, 1, 2, alignment=Qt.AlignLeft)
-        # self.settings_grid.addWidget(self.epochs_spin, 1, 2)
-        # self.settings_grid.addWidget(self.lr_label, 2, 0, 1, 2, alignment=Qt.AlignLeft)
-        # self.settings_grid.addWidget(self.lr_spin, 2, 2)
-        # self.settings_grid.addWidget(self.start_training, 3, 2)
-        # self.settings_grid.addWidget(self.check_plot, 3, 0, 1, 2)
-        # self.settings_grid.addWidget(self.status_label, 4, 1, alignment=Qt.AlignCenter)
-        # self.settings_grid.addWidget(self.reset_button, 5, 1)
-        # self.setLayout(self.settings_grid)
 
     def __configureSampleLabels__(self):
         self.dose_spin_label = QLabel("Д, мл", self)
